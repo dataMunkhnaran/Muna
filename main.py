@@ -11,3 +11,13 @@ from super_gradients.training.losses import PPYoloELoss
 from super_gradients.training.metrics import DetectionMetrics_050
 from super_gradients.training.models.detection_models.pp_yolo_e import PPYoloEPostPredictionCallback
 
+dataset_params = {
+    'data_dir':'/kaggle/input/face-detection-dataset',
+    'train_images_dir':'/kaggle/input/face-detection-dataset/images/train',
+    'train_labels_dir':'/kaggle/input/face-detection-dataset/labels/train',
+    'val_images_dir':'/kaggle/input/face-detection-dataset/images/val',
+    'val_labels_dir':'/kaggle/input/face-detection-dataset/labels/val',
+    'test_images_dir':'/kaggle/input/face-detection-dataset/images/val',
+    'test_labels_dir':'/kaggle/input/face-detection-dataset/labels/val',
+    'classes': ['face']    
+}
