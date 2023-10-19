@@ -21,3 +21,9 @@ dataset_params = {
     'test_labels_dir':'/kaggle/input/face-detection-dataset/labels/val',
     'classes': ['face']    
 }
+MODEL_ARCH = 'yolo_nas_l'
+DEVICE = 'cuda' if torch.cuda.is_available() else "cpu"
+BATCH_SIZE = 8
+MAX_EPOCHS = 20
+CHECKPOINT_DIR = f'/kaggle/working/'
+EXPERIMENT_NAME = f'yolo_nas_face'
