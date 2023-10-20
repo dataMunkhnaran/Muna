@@ -21,3 +21,48 @@ dataset_params = {
     'test_labels_dir':'/kaggle/input/face-detection-dataset/labels/val',
     'classes': ['face']    
 }
+MODEL_ARCH = 'yolo_nas_l'
+DEVICE = 'cuda' if torch.cuda.is_available() else "cpu"
+BATCH_SIZE = 8
+MAX_EPOCHS = 20
+CHECKPOINT_DIR = f'/kaggle/working/'
+EXPERIMENT_NAME = f'yolo_nas_face'
+
+train_data = coco_detection_yolo_format_train(
+    dataset_params={
+        'data_dir': dataset_params['data_dir'],
+        'images_dir': dataset_params['train_images_dir'],
+        'labels_dir': dataset_params['train_labels_dir'],
+        'classes': dataset_params['classes']
+    },
+    dataloader_params={
+        'batch_size': BATCH_SIZE,
+        'num_workers': 1
+    }
+)
+
+val_data = coco_detection_yolo_format_val(
+    dataset_params={
+        'data_dir': dataset_params['data_dir'],
+        'images_dir': dataset_params['val_images_dir'],
+        'labels_dir': dataset_params['val_labels_dir'],
+        'classes': dataset_params['classes']
+    },
+    dataloader_params={
+        'batch_size': BATCH_SIZE,
+        'num_workers': 1
+    }
+)
+
+test_data = coco_detection_yolo_format_val(
+    dataset_params={
+        'data_dir': dataset_params['data_dir'],
+        'images_dir': dataset_params['test_images_dir'],
+        'labels_dir': dataset_params['test_labels_dir'],
+        'classes': dataset_params['classes']
+    },
+    dataloader_params={
+        'batch_size': BATCH_SIZE,
+        'num_workers': 1
+    }
+)
