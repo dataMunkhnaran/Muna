@@ -1,56 +1,52 @@
-#pip install super_gradients
-import os
-import shutil
-import random
-from tqdm.notebook import tqdm
-from super_gradients.training import dataloaders
-from super_gradients.training.dataloaders.dataloaders import coco_detection_yolo_format_train, coco_detection_yolo_format_val
-import torch
-from super_gradients.training import models
-from super_gradients.training.losses import PPYoloELoss
-from super_gradients.training.metrics import DetectionMetrics_050
-from super_gradients.training.models.detection_models.pp_yolo_e import PPYoloEPostPredictionCallback
+import streamlit as st
+from keras.models import load_model
+from PIL import Image
+import numpy as np
+from ultralytics import YOLO
+from util import classify, set_background
+set_background('C:/Users/517-1/Downloads/Test/images.png')
 
-dataset_params = {
-    'data_dir':'/kaggle/input/face-detection-dataset',
-    'train_images_dir':'/kaggle/input/face-detection-dataset/images/train',
-    'train_labels_dir':'/kaggle/input/face-detection-dataset/labels/train',
-    'val_images_dir':'/kaggle/input/face-detection-dataset/images/val',
-    'val_labels_dir':'/kaggle/input/face-detection-dataset/labels/val',
-    'test_images_dir':'/kaggle/input/face-detection-dataset/images/val',
-    'test_labels_dir':'/kaggle/input/face-detection-dataset/labels/val',
-    'classes': ['face']    
-}
-MODEL_ARCH = 'yolo_nas_l'
-DEVICE = 'cuda' if torch.cuda.is_available() else "cpu"
-BATCH_SIZE = 8
-MAX_EPOCHS = 20
-CHECKPOINT_DIR = f'/kaggle/working/'
-EXPERIMENT_NAME = f'yolo_nas_face'
+# set title
+st.title('Tooth classification')
 
-train_data = coco_detection_yolo_format_train(
-    dataset_params={
-        'data_dir': dataset_params['data_dir'],
-        'images_dir': dataset_params['train_images_dir'],
-        'labels_dir': dataset_params['train_labels_dir'],
-        'classes': dataset_params['classes']
-    },
-    dataloader_params={
-        'batch_size': BATCH_SIZE,
-        'num_workers': 1
-    }
-)
+# set header
+st.header('Please upload tooth image')
 
-val_data = coco_detection_yolo_format_val(
-    dataset_params={
-        'data_dir': dataset_params['data_dir'],
-        'images_dir': dataset_params['val_images_dir'],
-        'labels_dir': dataset_params['val_labels_dir'],
-        'classes': dataset_params['classes']
-    },
-    dataloader_params={
-        'batch_size': BATCH_SIZE,
-        'num_workers': 1
-    }
-)
+# upload file
+file = st.file_uploader('', type=['jpeg', 'jpg', 'png'])
 
+# load classifier
+model = YOLO('C:/Users/517-1/Downloads/Test/best.pt')
+
+# load class names
+
+class_names = ['A1', 'S', 'Q', 'E', 'C0', 'C1', 'C2', 'C3', 'C4', 'Ca', 'F', 'F1', 'H', 'P', 'Pq', 'R']
+
+# Open the file and read lines
+with open('C:/Users/517-1/Downloads/Test/labels.txt', 'r') as f:
+    for line in f.readlines():
+        # Strip whitespace and split the line by space
+        parts = line.strip().split(' ')
+        # Check if the line has at least two parts
+        if len(parts) >= 2:
+            # Add the second part (index 1) to the class names list
+            class_names.append(parts[1])
+        else:
+            # If the line doesn't have the expected format, skip it
+            print(f"Ignoring line: {line.strip()}")
+
+# Close the file
+f.close()
+
+
+# display image
+if file is not None:
+    image = Image.open(file).convert('RGB')
+    st.image(image, use_column_width=True)
+
+    # classify image
+    class_name, conf_score = classify(image, model, class_names)
+
+    # write classification
+    st.write("## {}".format(class_name))
+    st.write("### score: {}%".format(int(conf_score * 1000) / 10))
